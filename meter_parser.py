@@ -15,6 +15,8 @@ class ParsedMeter:
     meter_black: Optional[int] = None
     meter_color: Optional[int] = None
     reading_date: Optional[str] = None
+    # Added field to capture the full cleaned email content for later review
+    raw_text: Optional[str] = None
     confidence: float = 0.0
     notes: List[str] = field(default_factory=list)
 
@@ -146,6 +148,8 @@ def calculate_confidence(from_email: str, result: ParsedMeter) -> float:
 def extract_meter_data(from_email: str, subject: str, body: str) -> ParsedMeter:
     full_text = clean_text(f"{subject}\n{body}")
     result = ParsedMeter()
+    # Store the full cleaned text so that raw messages are available when parsing fails
+    result.raw_text = full_text
     result.reading_date = try_parse_date(full_text)
     result.equipment_number = extract_equipment_number(full_text)
     result.serial_number = extract_serial_number(full_text)
